@@ -1,0 +1,9 @@
+{
+  "node":true,
+  "esnext":true
+  "globals": {
+    "angular": true,
+    "L": true,
+    "ESQ": true
+  }
+}

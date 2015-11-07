@@ -1,0 +1,20 @@
+nginx:
+  build: nginx/
+  links:
+    - node
+  ports:
+    - "80:80"
+
+node:
+  build: node/
+  links:
+    - elasticsearch
+  volumes:
+     - ./node:/app
+  ports:
+    - "3000:3000"
+
+elasticsearch:
+  image: elasticsearch:1.7
+  ports:
+    - "9200:9200"

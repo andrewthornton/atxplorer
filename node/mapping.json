@@ -1,0 +1,44 @@
+{
+    "requests": {
+        "properties": {
+            "number": {
+                "index": "not_analyzed",
+                "type": "string"
+            },
+            "code": {
+                "index": "not_analyzed",
+                "type": "string"
+            },
+            "description": {
+                "type": "string"
+            },
+            "owning_department": {
+                "type": "string"
+            },
+            "report_method": {
+                "index": "not_analyzed",
+                "type": "string"
+            },
+            "status": {
+                "index": "not_analyzed",
+                "type": "string"
+            },
+            "status": {
+                "index": "not_analyzed",
+                "type": "string"
+            },
+            "zip": {
+                "type": "integer"
+            },
+           "district": {
+                "type": "integer"
+            },
+           "street_number": {
+                "type": "integer"
+            },
+           "location": {
+                "type": "geo_point"
+            }
+        }
+    }
+}
