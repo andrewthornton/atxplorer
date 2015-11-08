@@ -9,17 +9,11 @@
                 "index": "not_analyzed",
                 "type": "string"
             },
-            "description": {
-                "type": "string"
-            },
             "owning_department": {
-                "type": "string"
-            },
-            "report_method": {
                 "index": "not_analyzed",
                 "type": "string"
             },
-            "status": {
+            "report_method": {
                 "index": "not_analyzed",
                 "type": "string"
             },

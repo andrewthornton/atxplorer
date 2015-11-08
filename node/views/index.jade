@@ -2,32 +2,44 @@ extends layout
 
 block content
   md-toolbar
-    .md-toolbar-tools
-      h1 ATXplorer - 311 Data Explorer
-  md-content(layout="row" layout-md="column")
-    div(flex="50" flex-md="100", flex-order-md="2")
-      atx-map(results="results.hits.hits", search="search(location)")
-    form(flex="50",  flex-md="100", flex-order-md="1" layout="column" layout-padding)
-      md-input-container
-        label Report Description
-        input(type="text", ng-model="request.description")
-      md-input-container
-        label Street
-        input(type="text", ng-model="request.street")
-      div(layout="row")
-        md-input-container(flex=50)
-          label Zip
-          input(type="text", ng-model="request.zip")
-        md-input-container(flex=50)
-          label Council District
-          md-select(ng-model="request.district", ng-change="search()")
-            md-option(ng-value="null") Any
-            md-option(ng-repeat="d in districts") {{d}}
-      //- div(layout="row")
-      //-   md-datepicker(type="date", ng-model="request.reported_date" md-placeholder="Created Date", flex=50)
-      //-   md-datepicker(type="date", ng-model="request.reported_date" md-placeholder="Closed Date" flex=50)
-      div(layout="row")
-        md-button(ng-click="search()").md-primary Search
-        md-button(ng-click="request = {}; search()").md-warn Clear
-      md-divider
+    .md-toolbar-tools(layout="row")
+        div(flex="50")
+          h1 ATXplorer - 311 Data Explorer
+        div(flex="50" style="text-align:right")
+          small 
+            a(href="http://encodingpixels.com" target="_blank") Created by Andrew Thornton
 
+  md-content(layout="row" layout-md="column" layout-sm="column")
+    div(flex="50" flex-md="100", flex-sm="100", flex-order-md="2" flex-order-sm="2")
+      atx-map(results="results.hits.hits", search="search(bounds)")
+    div(flex="50",  flex-md="100", flex-sm="100", flex-order-md="1" flex-order-sm="1" layout="column")
+      div(layout="column")
+        form(layout="column")
+          div(layout="row")
+            md-input-container(flex=50)
+              label Description
+              input(type="text", ng-model="request.description")
+            md-input-container(flex=50)
+              label Street
+              input(type="text", ng-model="request.street")
+          div(layout="row")
+            md-select(ng-model="request.zip" placeholder="Zip Code" flex=33 ng-change="search()")
+              md-option(ng-value="null") Any
+              md-option(ng-hide="z.key === 0" ng-repeat="z in aggregations.zips.buckets") {{z.key}}
+
+            md-select(ng-model="request.district" placeholder="Council District" flex="33" ng-change="search()")
+              md-option(ng-value="null") Any
+              md-option(ng-hide="z.key === 0" ng-repeat="z in aggregations.districts.buckets") {{z.key}}
+
+            md-select(ng-model="request.status" placeholder="Status" flex="33" ng-change="search()")
+              md-option(ng-value="null") Any
+              md-option(ng-hide="z.key === 0" ng-repeat="z in aggregations.statuses.buckets") {{z.key}}
+
+
+          div(layout="row")
+            md-button(ng-click="search()").md-primary Search
+            md-button(ng-click="request = {}; search()").md-warn Clear
+            md-button(disabled) Found {{results.hits.total | number}} results.
+          md-divider
+        div(layout="row")
+          atx-chart(data="results.aggregations.day.buckets" flex=50).chart

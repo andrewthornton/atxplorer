@@ -1,6 +1,6 @@
 {
   "node":true,
-  "esnext":true
+  "esnext":true,
   "globals": {
     "angular": true,
     "L": true,

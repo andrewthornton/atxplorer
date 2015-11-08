@@ -1,8 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var elasticsearch = require('elasticsearch');
-var loader = require('../loader');
-
 var client = new elasticsearch.Client({
   host: 'elasticsearch:9200',
 });
@@ -16,11 +14,9 @@ router.post('/search', (req, res) =>{
   client.search({
     index: 'data',
     type: 'requests',
-    size: 1000,
+    size: req.query.size || 10000,
     body: req.body
   }).then(results => res.send(results), error => res.send(error));
 });
-
-router.get('/load', loader);
 
 module.exports = router;

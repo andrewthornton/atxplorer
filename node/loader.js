@@ -1,12 +1,13 @@
 'use strict';
 
 var request = require('request');
+var d3 = require('d3');
 var csv = require('csv');
 var elasticsearch = require('elasticsearch');
 var WritableBulk = require('elasticsearch-streams').WritableBulk;
 var TransformToBulk = require('elasticsearch-streams').TransformToBulk;
 var mappings = require('./mapping');
-
+console.log('test')
 var columns = [
   'number',
   'code',
@@ -49,6 +50,7 @@ function bulkExec (bulkCmds, callback) {
     body  : bulkCmds
   }, callback);
 }
+var parse = d3.time.format('%m/%d/%Y %I:%M:%S %p').parse;
 
 var transform = csv.transform(function (row) {
   row.location = [+row.longitude || 0 ,+row.latitude || 0];
@@ -61,6 +63,10 @@ var transform = csv.transform(function (row) {
   row.zip = +row.zip;
   row.street_number = +row.street_number;
   row.district = +row.district;
+  row.status_changed_date = parse(row.status_changed_date);
+  row.created_date = parse(row.created_date);
+  row.last_updated_date = parse(row.last_updated_date);
+  row.closed_date = parse(row.closed_date);
   return row;
 });
 
@@ -73,15 +79,13 @@ function createIndex () {
   });
 }
 
-module.exports = (req, res) => {
-  client.indices.delete({index:'data'})
-    .then(() => createIndex(), () => createIndex())
-    .then(() => {
-      request.get('https://data.austintexas.gov/api/views/i26j-ai4z/rows.csv?accessType=DOWNLOAD')
-        .pipe(parser).pipe(transform).pipe(toBulk).pipe(ws)
-        .on('finish', () => res.send(200))
-        .on('error', (err) => res.send(500));
-    });
-};
+client.indices.delete({index:'data'})
+  .then(() => createIndex(), () => createIndex())
+  .then(() => {
+    request.get('https://data.austintexas.gov/api/views/i26j-ai4z/rows.csv?accessType=DOWNLOAD')
+      .pipe(parser).pipe(transform).pipe(toBulk).pipe(ws)
+      .on('finish', () => console.log('done!'))
+      .on('error', (err) => console.log(err));
+  });
 
 
