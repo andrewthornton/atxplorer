@@ -21,6 +21,10 @@
                 "index": "not_analyzed",
                 "type": "string"
             },
+            "description_not_analyzed": {
+                "index": "not_analyzed",
+                "type": "string"
+            },
             "zip": {
                 "type": "integer"
             },

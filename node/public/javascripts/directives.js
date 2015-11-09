@@ -48,6 +48,106 @@ angular.module('atxplorer.directives', [])
   };
 })
 
+.directive('atxBar', function () {
+  return {
+    scope: {
+      data: '=',
+      hover: '&'
+    },
+    template: '<div class="chart"></div>',
+    replace: true,
+    link: function ($scope, elem) {
+
+      var e = d3.select(elem[0]);
+      var outerWidth = elem[0].clientWidth,
+          outerHeight = elem[0].clientHeight,
+          margins = {top: 20, right:20, bottom: 40, left:60},
+          width = outerWidth - margins.right - margins.left,
+          height = outerHeight - margins.top - margins.bottom;
+
+      var svg = e.append('svg')
+          .attr('width', outerWidth)
+          .attr('height', outerHeight)
+        .append('g')
+          .attr('transform', 'translate(' + margins.left + ',' + margins.top + ')');
+
+      var background = svg.append('rect')
+        .attr('width', width)
+        .attr('height', height)
+        .style('fill', '#fff');
+
+      var x = d3.scale.ordinal()
+        .rangeBands([0,width]);
+
+      var y = d3.scale.linear()
+        .range([height, 0]);
+
+      var yAxis = d3.svg.axis().scale(y).orient('left');
+
+      var yAxisG = svg.append('g')
+        .attr('class', 'axis');
+
+      var data;
+      $scope.$watch('data', function (d) {
+        if(d) {
+          data = d;
+          draw();
+        }
+      });
+
+      var bars;
+
+      d3.select(window).on('resize', function () {
+          outerWidth = elem[0].clientWidth;
+          outerHeight = elem[0].clientHeight;
+          width = outerWidth - margins.right - margins.left;
+          height = outerHeight - margins.top - margins.bottom;
+          e.select('svg')
+            .attr('width', outerWidth)
+            .attr('height', outerHeight);
+          draw();
+      });
+
+      function draw () {
+        x.domain(data.map(function (d) {return d.key;})).rangeBands([0, width], 0.1);
+        y.domain([0, d3.max(data, function (d) {return d.doc_count;})]).range([height, 0]);
+        yAxisG.call(yAxis);
+
+        bars = svg.selectAll('.bars')
+          .data(data);
+
+        bars.enter().append('rect');
+
+        bars
+          .on('mouseover', function (d) {
+            d3.select(this).style('fill-opacity', 1);
+            $scope.$apply(function () {
+              $scope.hover({elem: d});
+            });
+          })
+          .on('mouseleave', function () {
+            d3.select(this).style('fill-opacity', 0.5);
+           $scope.$apply(function () {
+              $scope.hover({elem: null});
+            });
+          })
+          .transition()
+          .attr('class', 'bars')
+          .attr('x', function (d) {return x(d.key);})
+          .attr('width', x.rangeBand())
+          .attr('y', function (d) {return y(d.doc_count);})
+          .attr('height', function (d) {return height - y(d.doc_count);})
+          .style({
+            'fill': '#FF5722',
+            'fill-opacity': 0.5,
+          });
+
+
+        bars.exit().remove();
+      }
+    }
+  };
+})
 .directive('atxChart', function () {
   return {
     scope: {
@@ -56,10 +156,11 @@ angular.module('atxplorer.directives', [])
     template: '<div class="chart"></div>',
     replace: true,
     link: function ($scope, elem) {
+
       var e = d3.select(elem[0]);
       var outerWidth = elem[0].clientWidth,
           outerHeight = elem[0].clientHeight,
-          margins = {top: 20, right:20, bottom: 20, left:40},
+          margins = {top: 20, right:20, bottom: 40, left:60},
           width = outerWidth - margins.right - margins.left,
           height = outerHeight - margins.top - margins.bottom;
 
@@ -112,11 +213,21 @@ angular.module('atxplorer.directives', [])
         .x(function (d) {return x(d.key);})
         .y(function (d) {return y(d.doc_count);});
 
-      background.call(zoom);
+      // background.call(zoom);
+      d3.select(window).on('resize', function () {
+          outerWidth = elem[0].clientWidth;
+          outerHeight = elem[0].clientHeight;
+          width = outerWidth - margins.right - margins.left;
+          height = outerHeight - margins.top - margins.bottom;
+          e.select('svg')
+            .attr('width', outerWidth)
+            .attr('height', outerHeight);
+          draw();
+      });
 
       function draw () {
-        x.domain(d3.extent(data, function (d) {return d.key;}));
-        y.domain([0, d3.max(data, function (d) {return d.doc_count;})]);
+        x.domain(d3.extent(data, function (d) {return d.key;})).range([0, width]);
+        y.domain([0, d3.max(data, function (d) {return d.doc_count;})]).range([height, 0]);
         xAxisG.call(xAxis);
         yAxisG.call(yAxis);
 

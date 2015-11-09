@@ -16,22 +16,19 @@ block content
       div(layout="column")
         form(layout="column")
           div(layout="row")
-            md-input-container(flex=50)
-              label Description
-              input(type="text", ng-model="request.description")
+            md-autocomplete(flex=50 md-search-text-change="findDescription()" md-search-text="request.description" md-items="d in descriptions" md-floating-label="Description" md-item-text="d.key" placeholder="Start typing") {{d.key}}
             md-input-container(flex=50)
               label Street
               input(type="text", ng-model="request.street")
           div(layout="row")
-            md-select(ng-model="request.zip" placeholder="Zip Code" flex=33 ng-change="search()")
-              md-option(ng-value="null") Any
-              md-option(ng-hide="z.key === 0" ng-repeat="z in aggregations.zips.buckets") {{z.key}}
-
-            md-select(ng-model="request.district" placeholder="Council District" flex="33" ng-change="search()")
+            md-input-container(flex=33)
+              label Zip Code
+              input(type="number", ng-model="request.zip")
+            md-select(ng-model="request.district" placeholder="Council District" flex="33")
               md-option(ng-value="null") Any
               md-option(ng-hide="z.key === 0" ng-repeat="z in aggregations.districts.buckets") {{z.key}}
 
-            md-select(ng-model="request.status" placeholder="Status" flex="33" ng-change="search()")
+            md-select(ng-model="request.status" placeholder="Status" flex="33")
               md-option(ng-value="null") Any
               md-option(ng-hide="z.key === 0" ng-repeat="z in aggregations.statuses.buckets") {{z.key}}
 
@@ -39,7 +36,23 @@ block content
           div(layout="row")
             md-button(ng-click="search()").md-primary Search
             md-button(ng-click="request = {}; search()").md-warn Clear
-            md-button(disabled) Found {{results.hits.total | number}} results.
+            md-button(mg-disabled ng-show="results") Found {{results.hits.total | number}} results. Mapping latest {{results.hits.total < 20000 ? results.hits.total : 20000 | number}}
+          md-progress-linear(md-mode="indeterminate", ng-show="!results")
           md-divider
         div(layout="row")
-          atx-chart(data="results.aggregations.day.buckets" flex=50).chart
+          div(layout="column")
+            md-radio-group(ng-model="chartType" flex=50)
+              md-radio-button(value="time") Time Series
+              md-radio-button(value="histogram") Histogram
+            small {{active.key ? active.key + ' (' + active.doc_count + ')' : '&nbsp;'}}
+            atx-chart(
+              data="results.aggregations.day.buckets" 
+              flex=50
+              ng-hide="!results.aggregations.day.buckets.length || chartType !== 'time'"
+            ).chart
+            atx-bar(
+              data="results.aggregations.descriptions.buckets" 
+              flex=50, 
+              ng-hide="!results.aggregations.descriptions.buckets.length || chartType !== 'histogram'"
+              hover="active = elem"
+            ).chart

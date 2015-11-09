@@ -3,11 +3,14 @@
   width: 100%;
 }
 
-form, .chart {
-  height: calc((100vh - 64px) / 2);
+.chart {
+  height: calc(100vh / 2);
   width:  100%;
 }
 
+small {
+  padding-left: 55px;
+}
 .axis text {
   font-size: 11px;
 }

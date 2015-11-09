@@ -67,6 +67,7 @@ var transform = csv.transform(function (row) {
   row.created_date = parse(row.created_date);
   row.last_updated_date = parse(row.last_updated_date);
   row.closed_date = parse(row.closed_date);
+  row.description_not_analyzed = row.description;
   return row;
 });
 

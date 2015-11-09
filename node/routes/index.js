@@ -14,7 +14,7 @@ router.post('/search', (req, res) =>{
   client.search({
     index: 'data',
     type: 'requests',
-    size: req.query.size || 10000,
+    size: req.query.size || 20000,
     body: req.body
   }).then(results => res.send(results), error => res.send(error));
 });
