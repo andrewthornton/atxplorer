@@ -97,20 +97,20 @@ angular.module('atxplorer.directives', [])
 
       var bars;
 
-      d3.select(window).on('resize', function () {
-          outerWidth = elem[0].clientWidth;
-          outerHeight = elem[0].clientHeight;
-          width = outerWidth - margins.right - margins.left;
-          height = outerHeight - margins.top - margins.bottom;
-          e.select('svg')
-            .attr('width', outerWidth)
-            .attr('height', outerHeight);
-          draw();
-      });
+      // d3.select(window).on('resize', function () {
+      //     outerWidth = elem[0].clientWidth;
+      //     outerHeight = elem[0].clientHeight;
+      //     width = outerWidth - margins.right - margins.left;
+      //     height = outerHeight - margins.top - margins.bottom;
+      //     e.select('svg')
+      //       .attr('width', outerWidth)
+      //       .attr('height', outerHeight);
+      //     draw();
+      // });
 
       function draw () {
-        x.domain(data.map(function (d) {return d.key;})).rangeBands([0, width], 0.1);
-        y.domain([0, d3.max(data, function (d) {return d.doc_count;})]).range([height, 0]);
+        x.domain(data.map(function (d) {return d.key;})).rangeBands([0, width], 0.1, 0.9);
+        y.domain([0, d3.max(data, function (d) {return d.doc_count;})]).range([height, 0]).nice();
         yAxisG.call(yAxis);
 
         bars = svg.selectAll('.bars')
@@ -214,20 +214,20 @@ angular.module('atxplorer.directives', [])
         .y(function (d) {return y(d.doc_count);});
 
       // background.call(zoom);
-      d3.select(window).on('resize', function () {
-          outerWidth = elem[0].clientWidth;
-          outerHeight = elem[0].clientHeight;
-          width = outerWidth - margins.right - margins.left;
-          height = outerHeight - margins.top - margins.bottom;
-          e.select('svg')
-            .attr('width', outerWidth)
-            .attr('height', outerHeight);
-          draw();
-      });
+      // d3.select(window).on('resize', function () {
+      //     outerWidth = elem[0].clientWidth;
+      //     outerHeight = elem[0].clientHeight;
+      //     width = outerWidth - margins.right - margins.left;
+      //     height = outerHeight - margins.top - margins.bottom;
+      //     e.select('svg')
+      //       .attr('width', outerWidth)
+      //       .attr('height', outerHeight);
+      //     draw();
+      // });
 
       function draw () {
         x.domain(d3.extent(data, function (d) {return d.key;})).range([0, width]);
-        y.domain([0, d3.max(data, function (d) {return d.doc_count;})]).range([height, 0]);
+        y.domain([0, d3.max(data, function (d) {return d.doc_count;})]).range([height, 0]).nice();
         xAxisG.call(xAxis);
         yAxisG.call(yAxis);
 

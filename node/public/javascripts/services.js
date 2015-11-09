@@ -33,6 +33,7 @@ angular.module('atxplorer.services', [])
     q.query('aggs', 'statuses', 'terms', {size: 1000,field: 'status', order: {_term: 'asc'}});
     q.query('aggs', 'zips', 'terms', {size: 1000,field: 'zip', order: {_term: 'asc'}});
     q.query('aggs', 'districts', 'terms', {size: 1000,field: 'district', order: {_term: 'asc'}});
+    q.query('aggs', 'descriptions', 'terms', {field: 'description_not_analyzed', size: 10000, order: {_term: 'asc'}});
 
     return $http.post('/search?size=1000&search_type=count', q.getQuery()).then(function (data) {
       return data.data.aggregations;

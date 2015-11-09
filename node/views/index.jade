@@ -16,7 +16,9 @@ block content
       div(layout="column")
         form(layout="column")
           div(layout="row")
-            md-autocomplete(flex=50 md-search-text-change="findDescription()" md-search-text="request.description" md-items="d in descriptions" md-floating-label="Description" md-item-text="d.key" placeholder="Start typing") {{d.key}}
+            md-select(ng-model="request.description" placeholder="Description" flex=50)
+              md-option(ng-value="null") Any
+              md-option(ng-hide="z.key === 0" ng-repeat="z in aggregations.descriptions.buckets") {{z.key}}
             md-input-container(flex=50)
               label Street
               input(type="text", ng-model="request.street")

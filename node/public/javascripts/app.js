@@ -12,7 +12,6 @@ angular.module('app', ['ngMaterial', 'atxplorer.directives', 'atxplorer.services
   $scope.chartType = 'time';
 
   $scope.request = {
-    description: 'Loud Music'
   };
 
   atxSearch.dropdowns().then(function (data) {
