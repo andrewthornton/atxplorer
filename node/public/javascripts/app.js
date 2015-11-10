@@ -33,6 +33,7 @@ angular.module('app', ['ngMaterial', 'atxplorer.directives', 'atxplorer.services
         $scope.mapResults = data;
         $scope.histogramResults = data;
         $scope.timeResults = data;
+        $scope.clearBox = false;
       });
   };
 

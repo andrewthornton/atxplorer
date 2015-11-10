@@ -12,7 +12,7 @@ block content
   md-content(layout="column" layout-md="column" layout-sm="column")
     div(layout="row")
       div(flex="50" flex-md="100", flex-sm="100", flex-order-md="2" flex-order-sm="2")
-        atx-map(results="mapResults.hits.hits", search="searchMap(bounds)")
+        atx-map(results="mapResults.hits.hits", search="searchMap(bounds)", clear-box="clearBox")
       div(flex="50",  flex-md="100", flex-sm="100", flex-order-md="1" flex-order-sm="1" layout="column")
         div(layout="column")
           form(layout="column")
@@ -38,7 +38,7 @@ block content
 
             div(layout="row")
               md-button(ng-click="search()").md-primary Search
-              md-button(ng-click="request = {}; search()").md-warn Reset
+              md-button(ng-click="request = {}; clearBox = true; search()").md-warn Reset
               md-button(mg-disabled ng-show="results") Found {{results.hits.total | number}} results. Mapping latest {{results.hits.total < 20000 ? results.hits.total : 20000 | number}}
             md-progress-linear(md-mode="indeterminate", ng-show="!mapResults || !histogramResults || !timeResults")
             md-divider

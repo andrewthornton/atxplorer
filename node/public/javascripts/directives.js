@@ -6,7 +6,8 @@ angular.module('atxplorer.directives', [])
   return {
     scope: {
       results: '=',
-      search: '&'
+      search: '&',
+      clearBox: '='
     },
     replace: true,
     template: '<div class="map"><div>',
@@ -39,8 +40,11 @@ angular.module('atxplorer.directives', [])
       $scope.$watch('results', function (results) {
         if(results) {
           drawMap(results);
-          featureGroup.clearLayers();
         }
+      });
+
+      $scope.$watch('clearBox', function (val) {
+        if(val) featureGroup.clearLayers();
       });
 
       map.on('draw:drawstart', function () {
