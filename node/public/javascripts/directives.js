@@ -14,6 +14,20 @@ angular.module('atxplorer.directives', [])
       L.mapbox.accessToken = 'pk.eyJ1IjoiZW5jb2RpbmdwaXhlbHMiLCJhIjoiYmpGN2pNZyJ9.nJclG_aQ8Taqio-SjNHS8Q';
       var map = L.mapbox.map(elem[0], 'encodingpixels.leb549jf');
       var heat = new L.heatLayer([]).addTo(map);
+      var featureGroup = new L.featureGroup().addTo(map);
+
+      var drawControl = new L.Control.Draw({
+        draw: {
+          polyline: false,
+          circle: false,
+          polygon: false,
+          marker: false
+        },
+        edit: {
+          featureGroup: featureGroup,
+          edit:false
+        }
+      }).addTo(map);
 
       function drawMap (data) {
         heat.setLatLngs([]);
@@ -25,11 +39,24 @@ angular.module('atxplorer.directives', [])
       $scope.$watch('results', function (results) {
         if(results) {
           drawMap(results);
+          featureGroup.clearLayers();
         }
       });
 
-      map.on('moveend', function () {
-        var bounds = map.getBounds();
+      map.on('draw:drawstart', function () {
+        featureGroup.clearLayers();
+      });
+
+      map.on('draw:deletestop', function () {
+        featureGroup.clearLayers();
+        $scope.$apply(function () {
+          $scope.search();
+        });
+      });
+
+      map.on('draw:created', function (e) {
+        featureGroup.addLayer(e.layer);
+        var bounds = e.layer.getBounds();
         var topLeft = bounds.getNorthWest();
         var bottomRight = bounds.getSouthEast();
         topLeft.lon = topLeft.lng;
@@ -41,7 +68,7 @@ angular.module('atxplorer.directives', [])
           bottom_right: bottomRight
         };
         $scope.$apply(function () {
-          // $scope.search({bounds:tbounds});
+          $scope.search({bounds:tbounds});
         });
       });
     }
@@ -52,7 +79,7 @@ angular.module('atxplorer.directives', [])
   return {
     scope: {
       data: '=',
-      hover: '&'
+      click: '&'
     },
     template: '<div class="chart"></div>',
     replace: true,
@@ -75,6 +102,12 @@ angular.module('atxplorer.directives', [])
         .attr('width', width)
         .attr('height', height)
         .style('fill', '#fff');
+
+      var key = svg.append('g');
+
+      var keyText = key.append('text')
+        .attr('dy', '-0.78em')
+        .style('font-size', '10px');
 
       var x = d3.scale.ordinal()
         .rangeBands([0,width]);
@@ -112,6 +145,7 @@ angular.module('atxplorer.directives', [])
         x.domain(data.map(function (d) {return d.key;})).rangeBands([0, width], 0.1, 0.9);
         y.domain([0, d3.max(data, function (d) {return d.doc_count;})]).range([height, 0]).nice();
         yAxisG.call(yAxis);
+        keyText.text('');
 
         bars = svg.selectAll('.bars')
           .data(data);
@@ -121,14 +155,16 @@ angular.module('atxplorer.directives', [])
         bars
           .on('mouseover', function (d) {
             d3.select(this).style('fill-opacity', 1);
-            $scope.$apply(function () {
-              $scope.hover({elem: d});
-            });
+            keyText.text(d.key + ' (' + d.doc_count +')');
+            key.attr('transform', 'translate(' + x(d.key) +',' + y(d.doc_count)+ ')');
           })
           .on('mouseleave', function () {
+            keyText.text('');
             d3.select(this).style('fill-opacity', 0.5);
-           $scope.$apply(function () {
-              $scope.hover({elem: null});
+          })
+          .on('click', function (d) {
+            $scope.$apply(function () {
+              $scope.click({description:d.key});
             });
           })
           .transition()

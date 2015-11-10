@@ -17,6 +17,8 @@ angular.module('atxplorer.services', [])
       q.query('query', 'filtered', 'filter', ['and'], 'term', {district: search.district});
     if(search.status)
       q.query('query', 'filtered', 'filter', ['and'], 'term', {'status' : search.status});
+    if(search.bounds)
+      q.query('query', 'filtered', 'filter', ['and'], 'geo_bounding_box', {'location' : search.bounds});
 
     q.query('aggs', 'day', 'date_histogram', {field: 'created_date', interval: 'day'});
     q.query('aggs', 'descriptions', 'terms', {field: 'description_not_analyzed', size: 10000});

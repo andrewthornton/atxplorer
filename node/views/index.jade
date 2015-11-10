@@ -9,52 +9,54 @@ block content
           small 
             a(href="http://encodingpixels.com" target="_blank") Created by Andrew Thornton
 
-  md-content(layout="row" layout-md="column" layout-sm="column")
-    div(flex="50" flex-md="100", flex-sm="100", flex-order-md="2" flex-order-sm="2")
-      atx-map(results="results.hits.hits", search="search(bounds)")
-    div(flex="50",  flex-md="100", flex-sm="100", flex-order-md="1" flex-order-sm="1" layout="column")
-      div(layout="column")
-        form(layout="column")
-          div(layout="row")
-            md-select(ng-model="request.description" placeholder="Description" flex=50)
-              md-option(ng-value="null") Any
-              md-option(ng-hide="z.key === 0" ng-repeat="z in aggregations.descriptions.buckets") {{z.key}}
-            md-input-container(flex=50)
-              label Street
-              input(type="text", ng-model="request.street")
-          div(layout="row")
-            md-input-container(flex=33)
-              label Zip Code
-              input(type="number", ng-model="request.zip")
-            md-select(ng-model="request.district" placeholder="Council District" flex="33")
-              md-option(ng-value="null") Any
-              md-option(ng-hide="z.key === 0" ng-repeat="z in aggregations.districts.buckets") {{z.key}}
+  md-content(layout="column" layout-md="column" layout-sm="column")
+    div(layout="row")
+      div(flex="50" flex-md="100", flex-sm="100", flex-order-md="2" flex-order-sm="2")
+        atx-map(results="mapResults.hits.hits", search="searchMap(bounds)")
+      div(flex="50",  flex-md="100", flex-sm="100", flex-order-md="1" flex-order-sm="1" layout="column")
+        div(layout="column")
+          form(layout="column")
+            div(layout="row")
+              md-select(ng-model="request.description" placeholder="Description" flex=50)
+                md-option(ng-value="null") Any
+                md-option(ng-hide="z.key === 0" ng-repeat="z in aggregations.descriptions.buckets") {{z.key}}
+              md-input-container(flex=50)
+                label Street
+                input(type="text", ng-model="request.street")
+            div(layout="row")
+              md-input-container(flex=33)
+                label Zip Code
+                input(type="number", ng-model="request.zip")
+              md-select(ng-model="request.district" placeholder="Council District" flex="33")
+                md-option(ng-value="null") Any
+                md-option(ng-hide="z.key === 0" ng-repeat="z in aggregations.districts.buckets") {{z.key}}
 
-            md-select(ng-model="request.status" placeholder="Status" flex="33")
-              md-option(ng-value="null") Any
-              md-option(ng-hide="z.key === 0" ng-repeat="z in aggregations.statuses.buckets") {{z.key}}
+              md-select(ng-model="request.status" placeholder="Status" flex="33")
+                md-option(ng-value="null") Any
+                md-option(ng-hide="z.key === 0" ng-repeat="z in aggregations.statuses.buckets") {{z.key}}
 
 
-          div(layout="row")
-            md-button(ng-click="search()").md-primary Search
-            md-button(ng-click="request = {}; search()").md-warn Clear
-            md-button(mg-disabled ng-show="results") Found {{results.hits.total | number}} results. Mapping latest {{results.hits.total < 20000 ? results.hits.total : 20000 | number}}
-          md-progress-linear(md-mode="indeterminate", ng-show="!results")
-          md-divider
-        div(layout="row")
-          div(layout="column")
-            md-radio-group(ng-model="chartType" flex=50)
+            div(layout="row")
+              md-button(ng-click="search()").md-primary Search
+              md-button(ng-click="request = {}; search()").md-warn Reset
+              md-button(mg-disabled ng-show="results") Found {{results.hits.total | number}} results. Mapping latest {{results.hits.total < 20000 ? results.hits.total : 20000 | number}}
+            md-progress-linear(md-mode="indeterminate", ng-show="!mapResults || !histogramResults || !timeResults")
+            md-divider
+            md-radio-group(ng-model="chartType" flex=50, layout="row")
               md-radio-button(value="time") Time Series
               md-radio-button(value="histogram") Histogram
-            small {{active.key ? active.key + ' (' + active.doc_count + ')' : '&nbsp;'}}
-            atx-chart(
-              data="results.aggregations.day.buckets" 
-              flex=50
-              ng-hide="!results.aggregations.day.buckets.length || chartType !== 'time'"
-            ).chart
-            atx-bar(
-              data="results.aggregations.descriptions.buckets" 
-              flex=50, 
-              ng-hide="!results.aggregations.descriptions.buckets.length || chartType !== 'histogram'"
-              hover="active = elem"
-            ).chart
+            md-content(layout-padding layout="row")
+              small.
+                <strong>TIP:</strong> You can click on a bar of the histogram to filter the data by that description. Then click reset above to remove the filter. You can draw a rectangle on the map to filter the data by that geographic area.
+            md-divider
+    div(layout="column")
+      small {{active.key ? active.key + ' (' + active.doc_count + ')' : '&nbsp;'}}
+      atx-chart(
+        data="timeResults.aggregations.day.buckets" 
+        ng-hide="chartType !== 'time'"
+      ).chart
+      atx-bar(
+        data="histogramResults.aggregations.descriptions.buckets"  
+        ng-hide="chartType !== 'histogram'"
+        click="request.description = description; searchHistogram();"
+      ).chart

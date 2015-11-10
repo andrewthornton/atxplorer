@@ -25,12 +25,45 @@ angular.module('app', ['ngMaterial', 'atxplorer.directives', 'atxplorer.services
       });
   };
 
-  $scope.search = function (bounds) {
-    $scope.results = null;
+  $scope.search = function () {
+    $scope.mapResults = null;
+    $scope.histogramResults = null;
     atxSearch.search($scope.request)
       .then(function (data) {
-        console.log(data);
-        $scope.results = data;
+        $scope.mapResults = data;
+        $scope.histogramResults = data;
+        $scope.timeResults = data;
+      });
+  };
+
+  $scope.searchMap = function (bounds) {
+    $scope.timeResults = null;
+    $scope.histogramResults = null;
+    $scope.request.bounds = bounds;
+    atxSearch.search($scope.request)
+      .then(function (data) {
+        $scope.histogramResults = data;
+        $scope.timeResults = data;
+      });
+  };
+
+  $scope.searchHistogram = function (bounds) {
+    $scope.mapResults = null;
+    $scope.timeResults = null;
+    atxSearch.search($scope.request)
+      .then(function (data) {
+        $scope.mapResults = data;
+        $scope.timeResults = data;
+      });
+  };
+
+  $scope.searchTime = function (bounds) {
+    $scope.mapResults = null;
+    $scope.histogramResults = null;
+    atxSearch.search($scope.request)
+      .then(function (data) {
+        $scope.mapResults = data;
+        $scope.histogramResults = data;
       });
   };
 
